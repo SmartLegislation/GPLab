@@ -1,0 +1,135 @@
+
+# GPLab Configuration - Experiment 1
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+
+
+
+agent_driver_llm_index: [0,1,2,3]
+other_llm_index: [0,1,2,3]
+embedding_api_index: 1
+
+# QPS Control Configuration
+max_concurrent_requests: 200
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"      # Device for local embeddings ('cuda', 'cpu', etc.)
+
+# --- Social Agent Configuration ---
+agent_data_path: "../data/cgsc2018_profiles.json" # Path to the JSON file containing agent source data
+agent_sample_size: 200         # Number of agents to sample for the simulation
+agent_sample_seed: 42            # Random seed for agent sampling reproducibility
+agent_sampling_method: "random"  # Method for sampling agents ("random")
+
+# Agent Memory System Configuration
+memory_reflection_threshold: 5  # Number of memories before triggering reflection
+memory_reflection_count: 2       # Number of high-level memories generated per reflection
+memory_time_weight_lambda: 0.8   # Lambda for time-weighted k-NN retrieval (0.0 to 1.0)
+memory_retrieval_k: 5            # Number of memories to retrieve for context
+
+# Agent Decision Principles
+agent_decision_principles:
+  - "Follow the principle of rational self-interest from economics and Maslow's hierarchy of needs."
+  - "Your decisions should clearly reflect your personality traits and be consistent with your age, education level, income, family status, etc."
+  - "React to policies and social events based on your personal experiences and values. Express yourself in a way that matches your everyday habits and make decisions that show your individuality."
+
+# --- Social Subsystem Configuration ---
+subsystem_directory_group: "exp1"
+active_subsystems:               # List of subsystem class names to activate
+  - "EcoSystemExp1"
+  - "OpinionSystemExp1"
+
+# Configuration specific to each subsystem (passed as a dict to the subsystem's init)
+subsystem_configs:
+  EcoSystemExp1:
+    base_consumption_rate: 0.5
+    base_work_willingness: 0.6
+    required_agent_attributes: ["id", 
+    "Basic Information.Gender",
+    "Basic Information.Age",
+    "Basic Information.Gender", 
+    "Basic Information.Region",
+    "Basic Information.Marital Status",
+    "Basic Information.Education Level",
+    "Basic Information.Health Status",
+    "Psychological Attributes.Sense of Fairness",
+    "Psychological Attributes.Social Class",
+    "Economic Attributes.Annual Household Income",
+    "Economic Attributes.Annual Personal Income",
+    "Economic Attributes.Expenditure"]
+    environment_attributes: ["current_economic_policy", "socio_economic_status"]
+    decision_attributes:
+      - name: "consumption_willingness"
+        description: "<a number between 0.0 and 1.0 indicating your willingness to consume>"
+      - name: "savings_preference"
+        description: "<a number between 0.0 and 1.0 indicating your willingness to save>"
+      - name: "work_willingness"
+        description: "<a number between 0.0 and 1.0 indicating your willingness to work>"
+    economic_policies: # Epoch-keyed policies
+      "0": ""
+      # "4": "To promote consumption and stimulate the economy, the government has decided to issue consumption vouchers worth 10000 yuan per person, which can be used for various types of consumption"
+      # "5": "The consumption voucher policy continues to be implemented, with the second batch of vouchers issued at 1000 yuan per person, encouraging consumers to increase spending"
+      # "6": "The consumption voucher policy enters its final month, with regions continuing to issue vouchers and urging the public to use them quickly"
+
+  OpinionSystemExp1:
+    recommendation_algorithm: "random" # "random" or "similar"
+    # embedding_model defined globally or pass specific one if needed
+    num_recommendations: 5
+    use_initial_posts: True # Whether to seed with initial random posts (TBD implementation)
+    required_agent_attributes: ["id", 
+    "Basic Information.Gender", 
+    "Basic Information.Age",
+    "Basic Information.Gender", 
+    "Basic Information.Region", 
+    "Basic Information.Marital Status", 
+    "Basic Information.Education Level", 
+    "Basic Information.Health Status", 
+    "Psychological Attributes.Sense of Fairness", 
+    "Psychological Attributes.Social Class", 
+    "Social Attributes.Internet Usage"]
+    environment_attributes: ["recommended_posts", "current_news_headline"] # Added current_news_headline
+    decision_attributes: 
+      - name: "social_actions"
+        description: '[{"action": "post", "content": "<your post content string>"}, {"action": "like", "post_id": "<ID of post to like>"}, {"action": "repost", "post_id": "<ID of post to repost>"}]  # Provide a list of your social actions. You can post, like, or repost.'
+    news_headlines: # Epoch-keyed headlines
+      "0": "Seasonal flu outbreak in a city, current prevention situation is urgent!"
+      "1": "Emergency notice! Tense situation, multiple regions across the country activate major public health emergency response to address sudden infection events"
+      "2": "Warning! Public gathering epidemic comes fiercely, please take protective measures, reduce going out, avoid gatherings"
+      "3": "Epidemic continues to escalate, situation remains concerning, everyone needs to stay vigilant!"
+      "4": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "5": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "6": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "7": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "8": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "9": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "10": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "11": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+      "12": "Currently in a special period of epidemic prevention and control, please take protective measures, reduce going out, avoid gatherings"
+
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "consumption_voucher" # Prefix for the results directory name
+num_epochs: 1                   # Total number of simulation steps (epochs)
+start_date: "2020-12-01"         # Simulation start date (YYYY-MM-DD)
+epoch_duration_days: 30          # Duration of each epoch in days
+save_decision_prompts: False      # Whether to save agent decision prompts to the database
+
+# --- Logging Configuration ---
+log_level: "INFO"                # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)

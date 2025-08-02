@@ -1,0 +1,162 @@
+# GPLab Configuration - Health Code Policy Experiment
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+
+agent_driver_llm_index: [0,1,2,3]
+other_llm_index: [0,1,2,3]
+embedding_api_index: 1
+
+# QPS Control Configuration
+max_concurrent_requests: 50
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"
+
+# Social Agent Configuration
+agent_data_path: "../data/llm_mock_profiles.json"
+agent_sample_size: 200
+agent_sample_seed: 123
+agent_sampling_method: "random"
+
+# Memory System Configuration
+memory_reflection_threshold: 5
+memory_reflection_count: 2
+memory_time_weight_lambda: 0.8
+memory_retrieval_k: 5
+
+# Decision Principles
+agent_decision_principles:
+  - "Consider your health status, infection risk, and the current health code policy when making decisions about going out."
+  - "Balance between personal freedom, economic needs, and public health safety."
+  - "Follow health code requirements and consider the impact on your daily life and work."
+  - "You need to work and earn money to support yourself and family, so consider going to work even with some risk."
+  - "Social activities and shopping are important for your wellbeing, but weigh them against health risks."
+
+# --- Social Subsystem Configuration ---
+subsystem_directory_group: "health_code_policy"
+active_subsystems:
+  - "PublicOpinionSystem"
+  - "DiseaseTransmissionSystem"
+  - "CitizenHealthSystem"
+
+# Configuration specific to each subsystem
+subsystem_configs:
+  PublicOpinionSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "basic_info.education_level",
+      "basic_info.residence_type"
+    ]
+    environment_attributes: ["policy_announcements", "public_sentiment", "media_reports"]
+    decision_attributes:
+      - name: "express_opinion"
+        description: "<choose 'yes' or 'no' - whether to express opinion about health code policy>"
+      - name: "opinion_content"
+        description: "<if express_opinion is 'yes', provide your opinion text about the health code policy>"
+      - name: "opinion_sentiment"
+        description: "<choose from: 'positive', 'neutral', 'negative' - sentiment towards the policy>"
+    
+    # Policy announcements by epoch
+    policy_announcements:
+      "0": "Normal period: Citizens can move freely. Please maintain good hygiene habits."
+      "1": "Alert: Several COVID cases detected. Citizens are advised to reduce unnecessary gatherings."
+      "2": "Health Code System Launched: Green code for healthy, Yellow for close contacts, Red for confirmed cases. Only green codes allowed in public places."
+      "3": "Strict Control: All public venues require health code scanning. Yellow/Red code holders must quarantine."
+      "4": "Policy Adjustment: Yellow code holders can go to essential places with negative test within 48 hours."
+      "5": "Gradual Relaxation: Health code checking reduced to high-risk venues only. Focus on self-health monitoring."
+
+  DiseaseTransmissionSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "economic_attributes.employment_status"
+    ]
+    environment_attributes: ["infection_rate", "health_code_restrictions", "public_transport_risk"]
+    decision_attributes:
+      - name: "go_out_decision"
+        description: "<choose 'yes' or 'no' - whether to go out today>"
+      - name: "destination_type"
+        description: "<if go_out_decision is 'yes', choose from: 'work', 'shopping', 'social', 'medical', 'none'>"
+      - name: "transport_mode"
+        description: "<if go_out_decision is 'yes', choose from: 'walk', 'private_car', 'public_transport', 'none'>"
+    
+    # Transmission parameters by epoch
+    transmission_params:
+      base_infection_rate: 0.05  # Increased from 0.02 to make transmission more likely
+      public_transport_multiplier: 3.0
+      social_gathering_multiplier: 2.5
+      work_multiplier: 1.5
+      shopping_multiplier: 1.8
+      
+    # Health code impact on transmission
+    health_code_impact:
+      "0": { "restriction_level": 0, "transmission_reduction": 0 }
+      "1": { "restriction_level": 0.1, "transmission_reduction": 0.05 }
+      "2": { "restriction_level": 0.5, "transmission_reduction": 0.3 }
+      "3": { "restriction_level": 0.8, "transmission_reduction": 0.6 }
+      "4": { "restriction_level": 0.6, "transmission_reduction": 0.4 }
+      "5": { "restriction_level": 0.3, "transmission_reduction": 0.2 }
+
+  CitizenHealthSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "health_attributes.chronic_conditions"
+    ]
+    environment_attributes: ["health_status", "health_code_color", "neighbor_infection_status", "quarantine_status"]
+    decision_attributes:
+      - name: "health_check_frequency"
+        description: "<choose from: 'daily', 'every_3_days', 'weekly', 'when_required' - how often to check health status>"
+      - name: "report_symptoms"
+        description: "<choose 'yes' or 'no' - whether to report any symptoms to health authorities>"
+      - name: "follow_quarantine"
+        description: "<choose from: 'strict', 'moderate', 'loose' - level of quarantine compliance if required>"
+    
+    # Health parameters
+    health_params:
+      initial_infection_rate: 0.05  # Increased from 0.001 to ensure initial infections (5%)
+      age_risk_factors:
+        "0-18": 0.5
+        "19-40": 1.0
+        "41-60": 1.5
+        "61+": 2.0
+      chronic_condition_multiplier: 1.8
+      recovery_days_range: [7, 14]
+      
+    # Social network parameters
+    social_network:
+      avg_connections: 15
+      connection_types: ["family", "work", "friend", "neighbor"]
+      transmission_probability_by_type:
+        "family": 0.3
+        "work": 0.15
+        "friend": 0.1
+        "neighbor": 0.05
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "health_code_policy"
+num_epochs: 6
+start_date: "2024-01-01"
+epoch_duration_days: 14  # 2 weeks per epoch for faster policy cycles
+save_decision_prompts: True
+
+# --- Logging Configuration ---
+log_level: "INFO"

@@ -1,0 +1,144 @@
+# GPLab Configuration - Education Resource Balance Policy Experiment
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+
+agent_driver_llm_index: [0,1,2]
+other_llm_index: [0,1,2]
+embedding_api_index: [1]
+
+# QPS Control Configuration
+max_concurrent_requests: 50
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"
+
+# Social Agent Configuration
+agent_data_path: "../data/llm_mock_profiles.json"
+agent_sample_size: 200
+agent_sample_seed: 456
+agent_sampling_method: "random"
+
+# Agent Memory System Configuration
+memory_reflection_threshold: 5
+memory_reflection_count: 2
+memory_time_weight_lambda: 0.8
+memory_retrieval_k: 5
+
+# Agent Decision Principles
+agent_decision_principles:
+  - "Consider your children's educational needs, family financial situation, and commute distance when making school choices."
+  - "Evaluate the trade-offs between school quality, housing costs, and daily convenience."
+  - "Think about long-term educational outcomes versus immediate practical considerations."
+
+# --- Social Subsystem Configuration ---
+subsystem_directory_group: "education_balance"
+active_subsystems:
+  - "EducationResourceSystem"
+  - "SchoolChoiceSystem"
+
+# Configuration specific to each subsystem
+subsystem_configs:
+  EducationResourceSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "basic_info.marital_status",
+      "economic_attributes.income_level",
+      "basic_info.residence_type"
+    ]
+    environment_attributes: ["school_rankings", "education_policies", "school_resources", "district_info", "student_performance"]
+    decision_attributes:
+      - name: "school_choice_action"
+        description: "<choose from: 'stay_current', 'apply_transfer', 'move_residence', 'private_school'>"
+      - name: "preferred_school_type"
+        description: "<choose from: 'top_tier', 'good_quality', 'average', 'weak'>"
+      - name: "choice_motivation"
+        description: "<choose from: 'school_quality', 'commute_convenience', 'affordability', 'social_connections', 'special_programs'>"
+    
+    # School distribution and policies by epoch
+    education_policies:
+      "0": {
+        "resource_allocation": "traditional",  # Resources concentrated in top schools
+        "transfer_allowed": True,
+        "transfer_quota": 0.1,  # 10% of spots available for transfers
+        "subsidy_per_student": 0
+      }
+      "1": {
+        "resource_allocation": "traditional",
+        "transfer_allowed": True,
+        "transfer_quota": 0.1,
+        "subsidy_per_student": 0
+      }
+      "2": {  # Policy reform begins
+        "resource_allocation": "balanced",  # Resources redistributed
+        "transfer_allowed": True,
+        "transfer_quota": 0.05,  # Reduced transfer quota
+        "subsidy_per_student": 1000,  # Subsidy for average schools
+        "teacher_rotation": True  # Top teachers rotate between schools
+      }
+      "3": {
+        "resource_allocation": "balanced",
+        "transfer_allowed": True,
+        "transfer_quota": 0.05,
+        "subsidy_per_student": 1500,
+        "teacher_rotation": True
+      }
+      "4": {  # Further strengthening
+        "resource_allocation": "equalized",
+        "transfer_allowed": False,  # Strict district enrollment
+        "transfer_quota": 0,
+        "subsidy_per_student": 2000,
+        "teacher_rotation": True,
+        "facility_upgrade_fund": 5000000  # Fund for upgrading weak schools
+      }
+      "5": {
+        "resource_allocation": "equalized",
+        "transfer_allowed": False,
+        "transfer_quota": 0,
+        "subsidy_per_student": 2000,
+        "teacher_rotation": True,
+        "facility_upgrade_fund": 5000000
+      }
+
+  SchoolChoiceSystem:
+    required_agent_attributes: ["id", "basic_info.residence_type", "economic_attributes.income_level"]
+    environment_attributes: ["school_quality_changes", "enrollment_competition", "housing_market_impact", "housing_market"]
+    decision_attributes: []
+    
+    # School quality parameters
+    initial_school_qualities: {
+      "top_tier": 0.9,
+      "good_quality": 0.7,
+      "average": 0.5,
+      "weak": 0.3
+    }
+    
+    # District housing price correlation with school quality
+    school_housing_correlation: 0.7
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "education_balance"
+num_epochs: 6
+start_date: "2024-01-01"
+epoch_duration_days: 30
+save_decision_prompts: True
+
+# --- Logging Configuration ---
+log_level: "INFO"

@@ -1,0 +1,255 @@
+# GPLab Configuration - Tax Incentive Policy Experiment
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+
+
+agent_driver_llm_index: [0,1,2,3]
+other_llm_index: [0,1,2,3]
+embedding_api_index: 1
+
+# QPS Control Configuration
+max_concurrent_requests: 20
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"
+
+# Social Agent Configuration
+agent_data_path: "../data/llm_mock_profiles.json"
+agent_sample_size: 200
+agent_sample_seed: 123
+agent_sampling_method: "random"
+
+# Memory System Configuration
+memory_reflection_threshold: 5
+memory_reflection_count: 2
+memory_time_weight_lambda: 0.8
+memory_retrieval_k: 5
+
+# Decision Principles
+agent_decision_principles:
+  - "Consider your economic situation, personal values, and future plans when making financial decisions."
+  - "Evaluate the cost-benefit of different spending, saving, and investment options based on tax incentives."
+  - "Balance between immediate consumption needs and long-term financial goals."
+  - "Consider how your employment status and entrepreneurial aspirations affect your financial decisions."
+
+# --- Social Subsystem Configuration ---
+subsystem_directory_group: "tax_incentive"
+active_subsystems:
+  - "EconomicBehaviorSystem"
+  - "SocialOpinionSystem"
+  - "EmploymentBehaviorSystem"
+  - "ConsumptionBehaviorSystem"
+
+# Configuration specific to each subsystem
+subsystem_configs:
+  EconomicBehaviorSystem:
+    required_agent_attributes: [
+      "id",
+      "economic_attributes.income_level",
+      "economic_attributes.consumption_level"
+    ]
+    environment_attributes: ["economic_indicators", "tax_incentives", "market_trends"]
+    decision_attributes:
+      - name: "consumption_intention"
+        description: "<value between 0.0 and 1.0 - how much of your income you plan to spend on consumption>"
+      - name: "investment_intention"
+        description: "<value between 0.0 and 1.0 - how much of your income you plan to invest>"
+      - name: "saving_intention"
+        description: "<value between 0.0 and 1.0 - how much of your income you plan to save>"
+    
+    # 经济系统参数 - 增加消费和投资的基础乘数
+    consumption_multiplier: 1.2
+    investment_multiplier: 1.3
+    saving_rate_base: 0.2
+    
+    # Tax policy parameters by epoch - 调整政策参数使其更合理
+    tax_policies:
+      "0": { 
+        "consumption_tax_reduction": 0.0,
+        "investment_tax_deduction": 0.0,
+        "tax_free_savings_threshold": 0,
+        "policy_description": "Baseline tax policy with no special incentives"
+      }
+      "1": { 
+        "consumption_tax_reduction": 0.0,
+        "investment_tax_deduction": 0.0,
+        "tax_free_savings_threshold": 0,
+        "policy_description": "Baseline tax policy with no special incentives"
+      }
+      "2": {  # Phase 1: Investment incentives
+        "consumption_tax_reduction": 0.0,
+        "investment_tax_deduction": 0.08,
+        "tax_free_savings_threshold": 3000,
+        "policy_description": "New investment tax deduction of 8% and tax-free savings up to 3,000 yuan"
+      }
+      "3": { 
+        "consumption_tax_reduction": 0.0,
+        "investment_tax_deduction": 0.08,
+        "tax_free_savings_threshold": 3000,
+        "policy_description": "Investment tax deduction of 8% and tax-free savings up to 3,000 yuan"
+      }
+      "4": {  # Phase 2: Consumption incentives added
+        "consumption_tax_reduction": 0.05,
+        "investment_tax_deduction": 0.10,
+        "tax_free_savings_threshold": 5000,
+        "policy_description": "Expanded incentives: 5% consumption tax reduction, 10% investment deduction, and 5,000 yuan tax-free savings"
+      }
+      "5": { 
+        "consumption_tax_reduction": 0.05,
+        "investment_tax_deduction": 0.10,
+        "tax_free_savings_threshold": 5000,
+        "policy_description": "Expanded incentives: 5% consumption tax reduction, 10% investment deduction, and 5,000 yuan tax-free savings"
+      }
+
+  SocialOpinionSystem:
+    required_agent_attributes: [
+      "id", 
+      "economic_attributes.income_level",
+      "psychological_attributes.personality_traits",
+      "social_attributes.social_influence"
+    ]
+    environment_attributes: ["public_opinion", "policy_announcement", "social_media"]
+    decision_attributes:
+      - name: "post_intention"
+        description: "<value between 0.0 and 1.0 - likelihood of posting about tax policy on social media>"
+      - name: "post_sentiment"
+        description: "<value between -1.0 and 1.0 - your sentiment about the tax policy (-1.0 very negative, 1.0 very positive)>"
+      - name: "post_content"
+        description: "<optional - specific content of your social media post about the tax policy>"
+    
+    # 增加基础认可率
+    base_approval_rate: 0.6
+    opinion_volatility: 0.04
+    
+    # Policy announcements by epoch - 调整政策公告的描述使其更符合实际实施的政策
+    policy_announcements:
+      "0": {
+        "text": "Current tax policies remain unchanged for the coming fiscal year.",
+        "date": "2024-01-01",
+        "source": "Ministry of Finance"
+      }
+      "2": {
+        "text": "The government announces new investment incentives to boost economic growth. Starting next month, an 8% tax deduction will be available for qualifying investments, and savings up to 3,000 yuan will be tax-free.",
+        "date": "2024-03-01",
+        "source": "Ministry of Finance"
+      }
+      "4": {
+        "text": "The government expands economic stimulus with additional tax benefits for consumers. A 5% consumption tax reduction will be implemented alongside increased investment incentives of 10% and tax-free savings up to 5,000 yuan.",
+        "date": "2024-05-01",
+        "source": "Ministry of Finance"
+      }
+
+  EmploymentBehaviorSystem:
+    required_agent_attributes: [
+      "id", 
+      "economic_attributes.income_level",
+      "economic_attributes.occupation",
+      "economic_attributes.work_status"
+    ]
+    environment_attributes: ["labor_market", "tax_incentives", "personal_employment"]
+    decision_attributes:
+      - name: "career_change_intention"
+        description: "<value between 0.0 and 1.0 - likelihood of changing your employment status>"
+      - name: "entrepreneurship_intention"
+        description: "<value between 0.0 and 1.0 - likelihood of starting or expanding a business>"
+      - name: "productivity_effort"
+        description: "<value between 0.0 and 1.0 - level of effort you're putting into your work>"
+    
+    # 就业系统参数
+    base_employment_rate: 0.95
+    entrepreneur_tax_multiplier: 1.3
+    job_market_elasticity: 0.15
+    
+    # Employment incentives by epoch
+    employment_incentives:
+      "0": {
+        "entrepreneur_tax_credit": 0.0,
+        "employment_tax_deduction": 0.0,
+        "self_employment_benefits": "None",
+        "policy_description": "No special employment incentives in place"
+      }
+      "2": {
+        "entrepreneur_tax_credit": 0.08,
+        "employment_tax_deduction": 0.03,
+        "self_employment_benefits": "Tax deduction for business expenses",
+        "policy_description": "New entrepreneur tax credit of 8% and 3% employment income tax deduction"
+      }
+      "4": {
+        "entrepreneur_tax_credit": 0.12,
+        "employment_tax_deduction": 0.05,
+        "self_employment_benefits": "Enhanced tax deductions for business expenses and hiring",
+        "policy_description": "Expanded entrepreneur tax credit of 12% and 5% employment income tax deduction"
+      }
+
+  ConsumptionBehaviorSystem:
+    required_agent_attributes: [
+      "id", 
+      "economic_attributes.income_level",
+      "economic_attributes.consumption_level"
+    ]
+    environment_attributes: ["market_trends", "tax_incentives", "personal_consumption"]
+    decision_attributes:
+      - name: "consumption_level"
+        description: "<value between 0.0 and 1.0 - portion of your income you plan to spend>"
+      - name: "category_preferences"
+        description: "<object with keys 'essentials', 'leisure', 'durables', 'luxury' and values between 0.0-1.0 indicating your spending preferences>"
+    
+    # 消费系统参数 - 增加基础消费水平，降低波动性
+    base_consumption_level: 1500
+    consumption_volatility: 0.03
+    luxury_goods_threshold: 5000
+    
+    # Consumption tax policies by epoch
+    consumption_tax_policies:
+      "0": {
+        "general_consumption_tax": 0.13,
+        "essentials_tax_reduction": 0.0,
+        "leisure_tax_reduction": 0.0,
+        "durables_tax_reduction": 0.0,
+        "luxury_tax_reduction": 0.0,
+        "policy_description": "Standard consumption tax rate of 13% across all categories"
+      }
+      "2": {
+        "general_consumption_tax": 0.13,
+        "essentials_tax_reduction": 0.02,
+        "leisure_tax_reduction": 0.0,
+        "durables_tax_reduction": 0.05,
+        "luxury_tax_reduction": 0.0,
+        "policy_description": "Tax reductions: 2% for essentials and 5% for durable goods"
+      }
+      "4": {
+        "general_consumption_tax": 0.11,
+        "essentials_tax_reduction": 0.03,
+        "leisure_tax_reduction": 0.02,
+        "durables_tax_reduction": 0.07,
+        "luxury_tax_reduction": 0.01,
+        "special_promotions": "Additional 5% discount on domestic appliances and electronics",
+        "policy_description": "Broader consumption stimulus: General tax reduced to 11% with category-specific incentives"
+      }
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "tax_incentive"
+num_epochs: 6
+start_date: "2024-01-01"
+epoch_duration_days: 30
+save_decision_prompts: True
+
+# --- Logging Configuration ---
+log_level: "INFO"

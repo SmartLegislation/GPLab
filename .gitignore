@@ -1,0 +1,28 @@
+# Ignore specific folders
+/documents/
+/src/results/
+/src/results/visualization/
+/src/results_copy/
+/JASSS投稿latex/
+/论文《GPLab A Generative Policy Simulation Lab for Social Governance Evaluation》设计实现方法.md/
+/src/visualization/
+/.specstory/
+/sci_visualization_results/
+/embedding_model/
+/sage_latex_template_4/
+/docs/
+/policy_evalute_example.md/
+/GPLab-sscr/
+
+# General ignores
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+env/
+venv/
+ENV/
+.idea/
+.DS_Store 

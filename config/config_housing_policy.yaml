@@ -1,0 +1,115 @@
+# GPLab Configuration - Housing Purchase Restriction Policy Experiment
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+
+agent_driver_llm_index: [0,1,2]
+other_llm_index: [0,1,2]
+embedding_api_index: [1]
+
+# QPS Control Configuration
+max_concurrent_requests: 50
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"
+
+# Social Agent Configuration
+agent_data_path: "../data/llm_mock_profiles.json"
+agent_sample_size: 200
+agent_sample_seed: 42
+agent_sampling_method: "random"
+
+# Memory System Configuration
+memory_reflection_threshold: 5
+memory_reflection_count: 2
+memory_time_weight_lambda: 0.8
+memory_retrieval_k: 5
+
+# Decision Principles
+agent_decision_principles:
+  - "Consider your financial capability, family needs, and long-term investment goals when making housing decisions."
+  - "Evaluate the impact of government policies on your housing affordability and eligibility."
+  - "Balance between current living conditions and future housing aspirations based on market conditions."
+
+# Social Subsystem Configuration
+subsystem_directory_group: "housing_policy"
+active_subsystems:
+  - "HousingMarketSystem"
+  - "HousingOpinionSystem"
+
+# Configuration specific to each subsystem
+subsystem_configs:
+  HousingMarketSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "basic_info.marital_status",
+      "economic_attributes.income_level",
+      "economic_attributes.assets"
+    ]
+    environment_attributes: ["housing_prices", "purchase_restrictions", "mortgage_rates", "market_trends"]
+    decision_attributes:
+      - name: "housing_purchase_intention"
+        description: "<a value between 0.0 and 1.0 indicating your intention to purchase a house. 0.0-0.2 (no intention), 0.21-0.4 (considering), 0.41-0.6 (actively looking), 0.61-0.8 (ready to buy), 0.81-1.0 (urgent need)>"
+      - name: "housing_type_preference"
+        description: "<choose one from: 'first_home', 'upgrade_home', 'investment_property', 'no_preference'>"
+    
+    # Housing market parameters
+    initial_avg_price_per_sqm: 15000  # Yuan per square meter
+    price_volatility: 0.01  # Reduced from 0.02 to decrease price volatility
+    
+    # Purchase restriction policies by epoch
+    purchase_restrictions:
+      "0": { "max_properties_per_family": 3, "down_payment_ratio_first": 0.3, "down_payment_ratio_second": 0.5 }
+      "1": { "max_properties_per_family": 3, "down_payment_ratio_first": 0.3, "down_payment_ratio_second": 0.5 }
+      "2": { "max_properties_per_family": 2, "down_payment_ratio_first": 0.35, "down_payment_ratio_second": 0.6 }  # Policy tightening
+      "3": { "max_properties_per_family": 2, "down_payment_ratio_first": 0.35, "down_payment_ratio_second": 0.6 }
+      "4": { "max_properties_per_family": 1, "down_payment_ratio_first": 0.4, "down_payment_ratio_second": 0.7 }   # Further tightening
+      "5": { "max_properties_per_family": 1, "down_payment_ratio_first": 0.4, "down_payment_ratio_second": 0.7 }
+
+  HousingOpinionSystem:
+    required_agent_attributes: ["id", "basic_info.age", "social_attributes.social_style"]
+    environment_attributes: ["trending_topics", "policy_news", "market_sentiment"]
+    decision_attributes:
+      - name: "social_actions"
+        description: '[{"action": "post", "content": "<your post about housing market or policy>"}, {"action": "like", "post_id": "<ID>"}, {"action": "share", "post_id": "<ID>"}]'
+    
+    # Sentiment influence factor (how much public opinion affects market prices)
+    sentiment_influence_factor: 0.4
+    
+    policy_announcements:
+      "2": "Breaking: Government announces new housing purchase restrictions to cool down overheated market"
+      "4": "Update: Stricter limits - each family can now own only ONE property in urban areas"
+
+# --- System Integration Configuration ---
+system_integrations:
+  - source_system: "HousingOpinionSystem"
+    target_system: "HousingMarketSystem"
+    integration_method: "connect_to_opinion_system"
+    description: "Public opinion influences housing market prices"
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "housing_policy"
+num_epochs: 6
+start_date: "2024-01-01"
+epoch_duration_days: 30
+save_decision_prompts: True
+
+# --- Logging Configuration ---
+log_level: "INFO"

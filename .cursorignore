@@ -1,0 +1,9 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+
+# Don't index SpecStory auto-save files, but allow explicit context inclusion via @ references
+.specstory/**
+.sci_visualization_results/**
+.src/visualization/**
+.results/**
+.data/**
+.sci_visualization_results/**

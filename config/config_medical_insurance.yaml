@@ -1,0 +1,132 @@
+# GPLab Configuration - Medical Insurance Reform Policy Experiment
+
+# LLM and Embedding Model Configuration
+llm_api_configs:
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+  - base_url: "xx"
+    api_key: "xx"
+    model: "Meta-Llama-3.1-8B-Instruct"
+    temperature: 0.7
+    top_p: 0.9
+    description: "Local Meta-Llama-3.1-8B-Instruct"
+    weight: 1.0
+    
+agent_driver_llm_index: [0,1,2,3]
+other_llm_index: [0,1,2,3]
+embedding_api_index: [1]
+
+# QPS Control Configuration
+max_concurrent_requests: 100
+
+use_local_embedding_model: True
+local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+embedding_dimension: 384
+embedding_device: "cpu"
+
+# Social Agent Configuration
+agent_data_path: "../data/llm_mock_profiles.json"
+agent_sample_size: 100
+agent_sample_seed: 123
+agent_sampling_method: "random"
+
+# Memory System Configuration
+memory_reflection_threshold: 5
+memory_reflection_count: 2
+memory_time_weight_lambda: 0.8
+memory_retrieval_k: 5
+
+# Decision Principles
+agent_decision_principles:
+  - "Consider your health status, financial situation, and the urgency of medical needs when making healthcare decisions."
+  - "Evaluate the cost-benefit of different medical options based on insurance coverage and out-of-pocket expenses."
+  - "Balance between immediate health needs and long-term financial sustainability."
+
+# Social Subsystem Configuration
+subsystem_directory_group: "medical_insurance"
+active_subsystems:
+  - "MedicalInsuranceSystem"
+  - "HealthcareUtilizationSystem"
+
+# Configuration specific to each subsystem
+subsystem_configs:
+  MedicalInsuranceSystem:
+    required_agent_attributes: [
+      "id",
+      "basic_info.age",
+      "economic_attributes.income_level",
+      "basic_info.residence_type"
+    ]
+    environment_attributes: ["insurance_coverage", "reimbursement_rates", "hospital_info", "policy_changes"]
+    decision_attributes:
+      - name: "seek_medical_care"
+        description: "<choose 'yes' or 'no' - whether to seek medical care this month>"
+      - name: "hospital_tier_choice"
+        description: "<choose from: 'community_clinic', 'district_hospital', 'city_hospital', 'none' - which level of medical facility to visit>"
+      - name: "treatment_intensity"
+        description: "<choose from: 'basic', 'standard', 'comprehensive' - level of treatment to pursue>"
+    
+    # Insurance policy parameters by epoch
+    insurance_policies:
+      "0": { 
+        "community_clinic_reimbursement": 0.8,
+        "district_hospital_reimbursement": 0.7,
+        "city_hospital_reimbursement": 0.6,
+        "annual_deductible": 500
+      }
+      "1": { 
+        "community_clinic_reimbursement": 0.8,
+        "district_hospital_reimbursement": 0.7,
+        "city_hospital_reimbursement": 0.6,
+        "annual_deductible": 500
+      }
+      "2": {  # Reform begins - increase community clinic coverage
+        "community_clinic_reimbursement": 0.9,
+        "district_hospital_reimbursement": 0.65,
+        "city_hospital_reimbursement": 0.5,
+        "annual_deductible": 300
+      }
+      "3": { 
+        "community_clinic_reimbursement": 0.9,
+        "district_hospital_reimbursement": 0.65,
+        "city_hospital_reimbursement": 0.5,
+        "annual_deductible": 300
+      }
+      "4": {  # Further adjustment
+        "community_clinic_reimbursement": 0.95,
+        "district_hospital_reimbursement": 0.6,
+        "city_hospital_reimbursement": 0.45,
+        "annual_deductible": 200
+      }
+      "5": { 
+        "community_clinic_reimbursement": 0.95,
+        "district_hospital_reimbursement": 0.6,
+        "city_hospital_reimbursement": 0.45,
+        "annual_deductible": 200
+      }
+
+  HealthcareUtilizationSystem:
+    required_agent_attributes: ["id", "basic_info.age"]
+    environment_attributes: ["hospital_crowding", "wait_times", "service_quality"]
+    decision_attributes: []
+    
+    # Hospital capacity parameters
+    hospital_capacities:
+      "community_clinic": 500
+      "district_hospital": 300
+      "city_hospital": 200
+
+# --- Simulation and Evaluation Configuration ---
+simulation_name_prefix: "medical_insurance"
+num_epochs: 5
+start_date: "2024-01-01"
+epoch_duration_days: 30
+save_decision_prompts: False
+
+# --- Logging Configuration ---
+log_level: "INFO"
