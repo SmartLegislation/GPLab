@@ -25,7 +25,7 @@ embedding_api_index: 1
 max_concurrent_requests: 50
 
 use_local_embedding_model: True
-local_embedding_model_path: "models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
+local_embedding_model_path: "C://Users//Cromwell//.cache//huggingface//hub//models--sentence-transformers--all-MiniLM-L6-v2//snapshots//e4ce9877abf3edfe10b0d82785e83bdcb973e22e"
 embedding_dimension: 384
 embedding_device: "cpu"
 
