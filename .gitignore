@@ -13,6 +13,8 @@
 /docs/
 /policy_evalute_example.md/
 /GPLab-sscr/
+gitignore
+.gitignore
 
 # General ignores
 __pycache__/
@@ -25,4 +27,5 @@ env/
 venv/
 ENV/
 .idea/
-.DS_Store 
+.DS_Store
+.gitignore

@@ -1,5 +1,0 @@
-
-# Don't index SpecStory auto-save files, but allow explicit context inclusion via @ references
-.specstory/**
-.sci_visualization_results/**
-.src/visualization/**
