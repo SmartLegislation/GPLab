@@ -53,7 +53,7 @@ class OpenaiModel:
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": query})
-
+        print(f'query: {query}')
         query_params = {
             "model": self.config.model,
             "messages": messages,

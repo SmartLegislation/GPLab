@@ -3,20 +3,14 @@
 
 # LLM and Embedding Model Configuration
 llm_api_configs:
-  - base_url: "xx"
-    api_key: "xx"
-    model: "Meta-Llama-3.1-8B-Instruct"
+  - base_url: "https://open.bigmodel.cn/api/paas/v4/"
+    api_key: "e4e9dc6d65c245b17277f69908cce805.bctILUJ3fzrGkRK7"
+    model: "glm-4-flash"
     temperature: 0.7
     top_p: 0.9
     description: "Local Meta-Llama-3.1-8B-Instruct"
     weight: 1.0
-  - base_url: "xx"
-    api_key: "xx"
-    model: "Meta-Llama-3.1-8B-Instruct"
-    temperature: 0.7
-    top_p: 0.9
-    description: "Local Meta-Llama-3.1-8B-Instruct"
-    weight: 1.0
+
 
 
 
@@ -34,7 +28,7 @@ embedding_device: "cpu"      # Device for local embeddings ('cuda', 'cpu', etc.)
 
 # --- Social Agent Configuration ---
 agent_data_path: "../data/cgsc2018_profiles.json" # Path to the JSON file containing agent source data
-agent_sample_size: 200         # Number of agents to sample for the simulation
+agent_sample_size: 10         # Number of agents to sample for the simulation
 agent_sample_seed: 42            # Random seed for agent sampling reproducibility
 agent_sampling_method: "random"  # Method for sampling agents ("random")
 
@@ -126,7 +120,7 @@ subsystem_configs:
 
 # --- Simulation and Evaluation Configuration ---
 simulation_name_prefix: "consumption_voucher" # Prefix for the results directory name
-num_epochs: 1                   # Total number of simulation steps (epochs)
+num_epochs: 6                  # Total number of simulation steps (epochs)
 start_date: "2020-12-01"         # Simulation start date (YYYY-MM-DD)
 epoch_duration_days: 30          # Duration of each epoch in days
 save_decision_prompts: False      # Whether to save agent decision prompts to the database

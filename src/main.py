@@ -14,7 +14,7 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Run GPLab pandemic simulation')
     parser.add_argument('--config', 
-                       default='../config/config_health_code_policy.yaml',
+                       default='../config/config_exp1.yaml',
                        help='Path to the configuration file')
     args = parser.parse_args()
     
