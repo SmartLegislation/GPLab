@@ -251,9 +251,6 @@ GPLab/
 │       └── requirements.txt             # Web-specific dependencies
 ├── results/                         # Simulation outputs
 │   └── [scenario_name]/                 # Per-scenario results
-│       ├── agent_states/                # Agent state snapshots
-│       ├── subsystem_metrics/           # Subsystem evaluation metrics
-│       └── analysis_reports/            # AI-generated analysis reports
 └── requirements.txt                 # Python dependencies
 ```
 
